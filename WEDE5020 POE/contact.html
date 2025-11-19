@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact Us</title><meta name="description" content="Contact us.">
+<style>body{font-family:Arial;padding:1rem;max-width:800px;margin:auto;}label{display:block;margin-top:.7rem;}input,textarea,select{width:100%;padding:.5rem;margin-top:.25rem}.error{color:#b00020}.success{color:#006600;font-weight:600}button{margin-top:1rem;padding:.6rem 1rem}</style>
+</head>
+<body><h1>Contact Us</h1>
+<form id="contactForm" novalidate>
+<label>Name<input type="text" id="name" required minlength="2"><div class="error" id="err-name"></div></label>
+<label>Email<input type="email" id="email" required><div class="error" id="err-email"></div></label>
+<label>Message type<select id="messageType" required><option value="">-- Select --</option><option>General</option><option>Feedback</option><option>Volunteer Inquiry</option><option>Other</option></select><div class="error" id="err-messageType"></div></label>
+<label>Message<textarea id="message" rows="6" required minlength="10" maxlength="2000"></textarea><div class="error" id="err-message"></div></label>
+<button type="submit">Send Message</button><div id="status"></div></form>
+<script>
+(function(){const f=document.getElementById('contactForm'),s=document.getElementById('status');
+function c(){document.querySelectorAll('.error').forEach(e=>e.textContent='');s.textContent='';}
+function e(i,m){document.getElementById('err-'+i).textContent=m;}
+function v(){c();let o=true;const n=name.value.trim(),mail=email.value.trim(),t=messageType.value,m=message.value.trim();
+if(n.length<2){e('name','Enter name');o=false;}if(!/^\S+@\S+\.\S+$/.test(mail)){e('email','Enter valid email');o=false;}
+if(!t){e('messageType','Select type');o=false;}if(m.length<10){e('message','Message too short');o=false;}return o;}
+f.addEventListener('submit',async ev=>{ev.preventDefault();if(!v())return;const p={name:name.value.trim(),email:email.value.trim(),type:messageType.value,message:message.value.trim()};
+s.textContent='Sending...';try{const resp=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+if(resp.ok){s.textContent='Message sent';f.reset();}else{openMail(p);}}catch(err){openMail(p);} });
+function openMail(p){const to='info@yourdomain.org';window.location.href=`mailto:${to}?subject=${encodeURIComponent(p.type)}&body=${encodeURIComponent(p.message)}`;}
+})();</script></body></html>

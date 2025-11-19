@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Enquire — Volunteer, Sponsor or Request Services</title>
+  <meta name="description" content="Make an enquiry about programs, volunteering or sponsorship.">
+  <style>body{font-family:Arial,sans-serif;padding:1rem;max-width:800px;margin:auto;}label{display:block;margin-top:.75rem;}input,select,textarea{width:100%;padding:.5rem;margin-top:.25rem}.error{color:#b00020}.success{color:#006600;font-weight:600}button{margin-top:1rem;padding:.6rem 1rem}</style>
+</head>
+<body>
+<h1>Enquiry Form</h1>
+<form id="enquiryForm" novalidate>
+<label>Your full name<input type="text" id="name" required minlength="2"><div class="error" id="err-name"></div></label>
+<label>Email<input type="email" id="email" required><div class="error" id="err-email"></div></label>
+<label>Phone (optional)<input type="tel" id="phone" pattern="^\+?[0-9\s\-]{7,15}$"><div class="error" id="err-phone"></div></label>
+<label>Enquiry Type<select id="type" required>
+<option value="">-- Select --</option><option value="service">Request Service</option><option value="volunteer">Volunteer</option><option value="sponsor">Sponsor</option>
+</select><div class="error" id="err-type"></div></label>
+<label>Preferred start date<input type="date" id="startDate"><div class="error" id="err-startDate"></div></label>
+<label>Details<textarea id="details" rows="5" maxlength="1000" required></textarea><div class="error" id="err-details"></div></label>
+<button type="submit">Submit Enquiry</button>
+<div id="result"></div></form>
+<script>
+(function(){const f=document.getElementById('enquiryForm'),r=document.getElementById('result');function c(){document.querySelectorAll('.error').forEach(e=>e.textContent='');r.textContent='';}
+function e(i,m){document.getElementById('err-'+i).textContent=m;}
+function v(){c();let o=true;const n=name.value.trim(),mail=email.value.trim(),t=type.value,d=details.value.trim(),p=phone.value.trim();
+if(n.length<2){e('name','Enter name');o=false;}if(!/^\S+@\S+\.\S+$/.test(mail)){e('email','Enter valid email');o=false;}
+if(!t){e('type','Select type');o=false;}if(d.length<10){e('details','Write more details');o=false;}
+if(p && !/^\+?[0-9\s\-]{7,15}$/.test(p)){e('phone','Invalid phone');o=false;}return o;}
+function q(d){if(d.type==='service')return`Estimated cost: R${Math.round(150+Math.random()*350)}`;
+if(d.type==='volunteer')return`Next orientation soon.`;
+if(d.type==='sponsor')return`Sponsorship options will be emailed.`;return'Thank you';}
+f.addEventListener('submit',async ev=>{ev.preventDefault();if(!v())return;const p={name:name.value.trim(),email:email.value.trim(),phone:phone.value.trim(),type:type.value,startDate:startDate.value,details:details.value.trim()};
+r.textContent='Processing...';try{const resp=await fetch('/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+if(resp.ok){r.textContent=q(p);}else{r.textContent=q(p)+' (server error)';}}catch(err){r.textContent=q(p)+' (offline demo)';}});})();
+</script></body></html>
